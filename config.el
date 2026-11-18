@@ -32,7 +32,8 @@
 ;; There are two ways to load a theme. Both assume the theme is installed and
 ;; available. You can either set `doom-theme' or manually load a theme with the
 ;; `load-theme' function. This is the default:
-(setq doom-theme 'doom-one)
+;(setq doom-theme 'doom-one)
+(setq doom-theme 'doom-nord)
 ;; Specify both a dark and light theme, like so and Doom will choose which one
 ;; to load based on your system light/dark setting:
 ;;
@@ -102,3 +103,65 @@
   (define-key input-decode-map "\e[1;3B" [M-down])
   (define-key input-decode-map "\e[1;3C" [M-right])
   (define-key input-decode-map "\e[1;3D" [M-left]))
+
+;; Use the Windows clipboard in WSL terminals, without X11/Wayland tools.
+(when (and (getenv "WSL_INTEROP")
+           (executable-find "clip.exe")
+           (executable-find "powershell.exe"))
+  (defun my/wsl-copy-to-clipboard (text &optional _push)
+    "Copy TEXT to the Windows clipboard, preserving Unicode."
+    (let ((coding-system-for-write 'utf-16le))
+      (with-temp-buffer
+        (insert text)
+        (unless (zerop (call-process-region (point-min) (point-max)
+                                           "clip.exe" nil nil nil))
+          (error "Writing to the Windows clipboard failed")))))
+
+  (defun my/wsl-paste-from-clipboard ()
+    "Read Windows clipboard text, converting CRLF to Unix newlines."
+    (let ((coding-system-for-read 'utf-8-dos))
+      (with-temp-buffer
+        (unless (zerop
+                 (call-process
+                  "powershell.exe" nil t nil
+                  "-NoLogo" "-NoProfile" "-NonInteractive" "-Command"
+                  (concat "[Console]::OutputEncoding = "
+                          "[System.Text.UTF8Encoding]::new($false); "
+                          "[Console]::Write((Get-Clipboard -Raw))")))
+          (error "Reading from the Windows clipboard failed: %s"
+                 (buffer-string)))
+        (let ((text (buffer-string)))
+          (unless (string-empty-p text) text)))))
+
+  ;; Evil's explicit "+ register uses these backends rather than kill hooks.
+  (cl-defmethod gui-backend-set-selection
+    (selection value &context (window-system nil))
+    (when (and (eq selection 'CLIPBOARD) (stringp value))
+      (my/wsl-copy-to-clipboard value)))
+
+  (cl-defmethod gui-backend-get-selection
+    (selection _target &context (window-system nil))
+    (when (eq selection 'CLIPBOARD)
+      (my/wsl-paste-from-clipboard)))
+
+  (defun my/wsl-setup-clipboard ()
+    "Use the Windows clipboard for terminal frames."
+    (unless (display-graphic-p)
+      (setq select-enable-clipboard t
+            interprogram-cut-function #'gui-select-text
+            interprogram-paste-function #'gui-selection-value)))
+
+  ;; Run after Doom's tty module, which otherwise installs xclip's handlers.
+  (add-hook 'tty-setup-hook #'my/wsl-setup-clipboard t)
+  (my/wsl-setup-clipboard))
+
+
+;; Save the session on exit and restore it automatically on startup.
+(after! persp-mode
+  (setq persp-auto-save-opt 1
+        persp-auto-resume-time 0.5))
+
+;; start server
+(after! server
+  (unless (server-running-p)
+    (server-start)))

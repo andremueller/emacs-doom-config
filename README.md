@@ -40,6 +40,17 @@ Install language servers and tools for the enabled modules as needed:
 - **Go (`go +lsp`)**: `go` and `gopls` (`go install golang.org/x/tools/gopls@latest`)
 - **Docker**: `docker` CLI
 
+### WSL2 / Windows Terminal
+
+For `emacs -nw`, `config.el` connects directly to the Windows text clipboard
+using `clip.exe` and `powershell.exe`. WSL interop must be enabled and both
+commands must be on Emacs's `PATH`; no Linux clipboard utility is required.
+Unicode, multiline text, and Windows CRLF line endings are handled explicitly.
+
+- In Evil normal mode, `yy` copies a line and `p` pastes from the clipboard.
+- The explicit `"+` clipboard register also works (`"+y` and `"+p`).
+- Restart Emacs after changing this configuration; `doom sync` is not needed.
+
 ## Installation
 
 1. **Back up any existing Emacs configuration**:
