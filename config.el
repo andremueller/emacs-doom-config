@@ -83,3 +83,15 @@
 
 (unless (display-graphic-p)
   (xterm-mouse-mode 1))
+
+;; disable window splitting/pop-up style in terminal mode
+(unless (display-graphic-p)
+  (setq vertico-posframe-mode nil)
+  (setq which-key-posframe-mode nil))
+
+;; change through windows by ALT+arrow
+(unless (display-graphic-p)
+  (map! "M-<left>"  #'windmove-left
+        "M-<right>" #'windmove-right
+        "M-<up>"    #'windmove-up
+        "M-<down>"  #'windmove-down))
