@@ -51,3 +51,9 @@
 ;; (unpin! pinned-package another-pinned-package)
 ;; ...Or *all* packages (NOT RECOMMENDED; will likely break things)
 ;; (unpin! t)
+
+;; Use NonGNU ELPA's GitHub mirror when codeberg.org is unreachable
+(package! corfu-terminal
+  :recipe (:host github :repo "emacsmirror/nongnu_elpa" :branch "elpa/corfu-terminal"))
+(package! popon
+  :recipe (:host github :repo "emacsmirror/nongnu_elpa" :branch "elpa/popon"))
