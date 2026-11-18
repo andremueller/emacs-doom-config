@@ -95,3 +95,10 @@
         "M-<right>" #'windmove-right
         "M-<up>"    #'windmove-up
         "M-<down>"  #'windmove-down))
+
+;; fallback for escape sequences in terminal modes
+(unless (display-graphic-p)
+  (define-key input-decode-map "\e[1;3A" [M-up])
+  (define-key input-decode-map "\e[1;3B" [M-down])
+  (define-key input-decode-map "\e[1;3C" [M-right])
+  (define-key input-decode-map "\e[1;3D" [M-left]))
