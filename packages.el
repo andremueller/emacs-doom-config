@@ -52,8 +52,10 @@
 ;; ...Or *all* packages (NOT RECOMMENDED; will likely break things)
 ;; (unpin! t)
 
-;; Use NonGNU ELPA's GitHub mirror when codeberg.org is unreachable
+;; Use separate checkouts for NonGNU ELPA branches when codeberg.org is unreachable.
 (package! corfu-terminal
-  :recipe (:host github :repo "emacsmirror/nongnu_elpa" :branch "elpa/corfu-terminal"))
+  :recipe (:host github :repo "emacsmirror/nongnu_elpa"
+           :branch "elpa/corfu-terminal" :local-repo "corfu-terminal-mirror"))
 (package! popon
-  :recipe (:host github :repo "emacsmirror/nongnu_elpa" :branch "elpa/popon"))
+  :recipe (:host github :repo "emacsmirror/nongnu_elpa"
+           :branch "elpa/popon" :local-repo "popon-mirror"))

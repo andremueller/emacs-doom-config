@@ -51,6 +51,11 @@ Unicode, multiline text, and Windows CRLF line endings are handled explicitly.
 - The explicit `"+` clipboard register also works (`"+y` and `"+p`).
 - Restart Emacs after changing this configuration; `doom sync` is not needed.
 
+Terminal completion uses GitHub's NonGNU ELPA mirror for `corfu-terminal` and
+`popon`. Their recipes must use separate `:local-repo` directories because they
+live on different branches of the same upstream repository. Run `doom sync`
+after changing these recipes.
+
 ## Installation
 
 1. **Back up any existing Emacs configuration**:
@@ -71,6 +76,7 @@ Unicode, multiline text, and Windows CRLF line endings are handled explicitly.
 
    ```bash
    git clone https://github.com/andremueller/emacs-doom-config.git ~/.config/doom
+   mkdir -p ~/.config/doom/snippets
    ```
 
 4. **Install Doom and sync packages**:
